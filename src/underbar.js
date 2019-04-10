@@ -117,6 +117,36 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var iteratedArr = [];
+    var obj = {};
+    var result = [];
+    if (!isSorted) {
+      array.sort();
+      var isSorted = true;
+    }
+    //iterator === undefined ? value : iterator;
+    if (iterator === undefined) {
+      var iterator = function(value) {
+        return value;
+      };
+    }
+
+    for (var i = 0; i <array.length; i++) {
+      iteratedArr[i] = iterator(array[i]);
+    }
+    for (var i = 0; i < array.length; i++) {
+      if (!obj[iteratedArr[i]]) {
+        obj[iteratedArr[i]] = array[i];
+      }
+
+    }
+    for(var key in obj) {
+      result.push(obj[key]);
+    }
+
+
+
+    return result;
   };
 
 
