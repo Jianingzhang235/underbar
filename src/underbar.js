@@ -155,6 +155,12 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var result = [];
+    _.each(collection, function(element) {
+      result.push(iterator(element));
+
+    });
+    return result;
   };
 
   /*
@@ -196,6 +202,20 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+
+    var start = true;
+    _.each(collection, function(a) {
+      if (start === true && accumulator === undefined) {
+        accumulator = a;
+      }
+
+      if (iterator !== undefined){
+        accumulator = iterator(accumulator, a);
+      } else {
+        accumulator += a;
+      }
+    })
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -214,12 +234,31 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    iterator = iterator || _.identity;
+    for(var i = 0; i < collection.length; i++) {
+      if (!iterator(collection[i])) {
+         return false;
+      }
+    }
+    return true;
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
+    // TIP: There's a very clever way to re-use every() here
+    iterator = iterator || _.identity;
+    for (var i = 0; i < collection.length; i++) {
+          if (iterator(collection[i])) {
+            return true;
+          }
+    }
+   // _.every(collection, function(element) {
+    //   if(iterator(element)) {
+    //     return false;
+   //    }
+   // });
+    return false;
   };
 
 
@@ -242,6 +281,17 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var result = arguments[0];
+    if (arguments.length === 1) {
+      return result;
+    } else if (arguments.length > 1) {
+      for (var i = 0; i < arguments.length; i++) {
+        for (var key in arguments[i]) {
+          result[key] = arguments[i][key];
+        }
+      }
+    }
+    return result;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
