@@ -202,17 +202,14 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    var start = arguments.length === 2;// checks to see if there is an accumulator
 
-    var start = true;
     _.each(collection, function(a) {
-      if (start === true && accumulator === undefined) {
+      if(start) {
+        start = false;
         accumulator = a;
-      }
-
-      if (iterator !== undefined){
-        accumulator = iterator(accumulator, a);
       } else {
-        accumulator += a;
+        accumulator = iterator(accumulator, a);
       }
     })
     return accumulator;
@@ -297,6 +294,19 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var result = arguments[0];
+    if (arguments.length === 1) {
+      return result;
+    } else if (arguments.length > 1) {
+      for (var i = 0; i < arguments.length; i++) {
+        for (var key in arguments[i]) {
+          if (result[key] === undefined) {
+          result[key] = arguments[i][key];
+          }
+        }
+      }
+    }
+    return result;
   };
 
 
@@ -340,6 +350,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var result = {};
+    return function() {
+      var args = JSON.stringify(arguments);
+      if (!result[args]) {
+        result[args] = func.apply(this, arguments);
+      };
+      return result[args];
+
+    }
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -349,6 +369,15 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var result;
+    if(arguments.length === 2) {
+      result = window.setTimeout(func, wait);
+    } else if(arguments.length > 2) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      result = window.setTimeout(func.apply(null, args), wait, args);
+    }
+    return result;
+
   };
 
 
@@ -363,6 +392,15 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var newArray = []; // create a return array
+    var copy = array.slice(); // create a copy of the array to manipulate copy and not origin array
+
+    for (var i = 0; i < array.length; i++) {
+      var random = Math.floor(Math.random() * copy.length);// create random number
+      newArray.push(copy[random]);// take random index from copy and push into newArray
+      copy.splice(random, 1);// delete that random index to avoid doubles
+    }
+    return newArray;
   };
 
 
